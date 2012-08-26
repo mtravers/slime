@@ -146,6 +146,7 @@ $rpc_entries = Hash.new
 $rpc_entries[:"swank:connection-info"] = lambda do ||
     [:":pid", $$,
      :":package", [:":name", "ruby", :":prompt", "ruby> "],
+     :":encoding", [:":coding-systems", ["utf-8-unix", "iso-latin-1-unix"]],
      :":lisp-implementation", [:":type", "Ruby",
                                :":name", "ruby",
                                :":version", RUBY_VERSION]]
@@ -184,6 +185,13 @@ end
 $rpc_entries[:"swank:simple-completions"] = lambda do |prefix, pkg|
   swank_simple_completions prefix, pkg
 end
+
+#mt -- ignore for now
+$rpc_entries[:"swank:swank-require"] = lambda do |mod|
+  puts "require #{mod}"
+  :nil
+end
+
 
 # def swank_simple_completions(prefix, pkg)
 
