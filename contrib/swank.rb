@@ -192,6 +192,21 @@ $rpc_entries[:"swank:swank-require"] = lambda do |mod|
   :nil
 end
 
+  
+#mt: Repl
+
+$rpc_entries[:"swank:create-repl"] = lambda do |foo, bar, coding_system| # +++
+  puts 'got create-repl'
+  repl = nil
+  ["USER", "ruby"]
+end
+
+
+$rpc_entries[:"swank:listener-eval"] = lambda do |string|
+  [:":values", swank_interactive_eval(string)]
+end
+
+
 
 # def swank_simple_completions(prefix, pkg)
 
@@ -388,6 +403,7 @@ class StringInputStream
       raise "Invalid argument: %c [at %d]" % [c, @pos]
     end
   end
-  
+
+
 end
 
