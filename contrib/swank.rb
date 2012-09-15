@@ -7,6 +7,33 @@
 # Only a few things work.  
 # 1. Start the server with something like: ruby -r swank -e swank
 # 2. Use M-x slime-connect to establish a connection
+#     (use "localhost" rather than default 127.0.0.1)
+
+# TODOS:
+# - make _ work
+# multi-line inputs (?)
+
+# here's what the lisp swank does:
+
+# getting arglist (cool, but may not be possible in the OOPy Ruby)
+# (:emacs-rex
+#  (swank:operator-arglist "print" "COMMON-LISP-USER")
+#  "COMMON-LISP-USER" :repl-thread 5)
+# (:return
+#  (:ok "(print OBJECT &OPTIONAL STREAM)")
+#  5)
+
+
+# note the output.  But I have no idea how to "bind *standard-output*" or the equiv
+# (:emacs-rex
+#  (swank:listener-eval "(print 23)\n")
+#  "COMMON-LISP-USER" :repl-thread 6)
+# (:write-string "\n23 ")
+# (:write-string "23\n" :repl-result)
+# (:return
+#  (:ok nil)
+#  6)
+
 
 require "socket"
 
@@ -76,16 +103,19 @@ class Connection
   def emacs_rex(form, pkg, thread, id)
     proc = $rpc_entries[form[0]]
     args = form[1..-1];
+    value = nil
     begin
       raise "Undefined function: #{form[0]}" unless proc
-      value = proc[*args]
+      out = capture_stdout { value = proc[*args] }
     rescue Exception => exc
       begin
         pseudo_debug exc
       ensure
+        send_to_emacs([:":write-string", out]) unless out == ""
         send_to_emacs [:":return", [:":abort"], id]
       end
     else
+      send_to_emacs([:":write-string", out]) unless out == ""
       send_to_emacs [:":return", [:":ok", value], id]
     end
   end
@@ -205,8 +235,6 @@ end
 $rpc_entries[:"swank:listener-eval"] = lambda do |string|
   [:":values", swank_interactive_eval(string)]
 end
-
-
 
 # def swank_simple_completions(prefix, pkg)
 
@@ -407,3 +435,23 @@ class StringInputStream
 
 end
 
+# STDOUT capture mechanism
+
+require 'stringio'
+
+# example:
+# capture_stdout { p 3 + 5 }
+# "8\n"
+
+module Kernel
+ 
+  def capture_stdout
+    out = StringIO.new
+    $stdout = out
+    yield
+    return out.string
+  ensure
+    $stdout = STDOUT
+  end
+ 
+end
