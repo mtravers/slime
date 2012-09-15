@@ -3,6 +3,7 @@
 # This is my first Ruby program and looks probably rather strange.  Some
 # people write Scheme interpreters when learning new languages, I
 # write swank backends.  
+
 #
 # Only a few things work.  
 # 1. Start the server with something like: ruby -r swank -e swank
@@ -12,28 +13,6 @@
 # TODOS:
 # - make _ work
 # multi-line inputs (?)
-
-# here's what the lisp swank does:
-
-# getting arglist (cool, but may not be possible in the OOPy Ruby)
-# (:emacs-rex
-#  (swank:operator-arglist "print" "COMMON-LISP-USER")
-#  "COMMON-LISP-USER" :repl-thread 5)
-# (:return
-#  (:ok "(print OBJECT &OPTIONAL STREAM)")
-#  5)
-
-
-# note the output.  But I have no idea how to "bind *standard-output*" or the equiv
-# (:emacs-rex
-#  (swank:listener-eval "(print 23)\n")
-#  "COMMON-LISP-USER" :repl-thread 6)
-# (:write-string "\n23 ")
-# (:write-string "23\n" :repl-result)
-# (:return
-#  (:ok nil)
-#  6)
-
 
 require "socket"
 
